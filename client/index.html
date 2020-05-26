@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Тестовое задание backend Java</title>
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+         integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css">
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+         integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+         integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+      <script src="https://momentjs.com/downloads/moment.min.js"></script>
+      <script src="https://unpkg.com/vue"></script>
+      <script src="https://unpkg.com/vuejs-datepicker"></script>
+      <script src="https://unpkg.com/vuejs-datepicker/dist/locale/translations/ru.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+   </head>
+   <body>
+      <div class="container">
+         <div id="app">
+            <div class="row">
+               <div class="col-sm">
+                  <p>Список машин</p>
+                  <button type="button" title="Добавить машину" class="btn btn-success" data-toggle="modal"
+                     data-target="#carModal">
+                  <i class="mdi mdi-plus" aria-hidden="true"></i>
+                  </button>
+                  <input class="form-control form-control-sm" v-model="nomer" type="text" placeholder="Введите номер машины">
+                  <table class="table table-bordered">
+                     <thead>
+                        <tr>
+                           <th scope="col">Выбрать</th>
+                           <th scope="col">Название модели машины</th>
+                           <th scope="col">Номер</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr v-for="car in cars" :key="car.id">
+                           <td align="center">
+                              <input type="radio" v-model="carId" v-bind:value="car.id" class="form-check-input" id="checkedCars"
+                                 name="checkCar">
+                           </td>
+                           <td> {{ car.modelCar.name }} </td>
+                           <td> {{ car.nomer }} </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+               <div class="col-sm">
+                  <p>Список пользователей</p>
+                  <button type="button" title="Добавить пользователя" class="btn btn-success" data-toggle="modal"
+                     data-target="#rentorModal">
+                  <i class="mdi mdi-plus" aria-hidden="true"></i>
+                  </button>
+                  <input class="form-control form-control-sm" v-model="fio" type="text" placeholder="Введите ФИО">
+                  <table class="table table-bordered">
+                     <thead>
+                        <tr>
+                           <th scope="col">Выбрать</th>
+                           <th scope="col">Фамилия</th>
+                           <th scope="col">Имя</th>
+                           <th scope="col">Отчество</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr v-for="renter in renters" :key="renter.id">
+                           <td align="center">
+                              <input type="radio" v-model="rentersId" v-bind:value="renter.id" class="form-check-input"
+                                 id="checkedRenters" name="checkRenter">
+                           </td>
+                           <td> {{ renter.surname }} </td>
+                           <td> {{ renter.name }} </td>
+                           <td> {{ renter.patronymic }} </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+            <div class="row">
+               <div class="col-sm">
+                  <p>Список истории арендованных машин</p>
+                  <button type="button" title="Вывести список аренды по выбранной машине" class="btn btn-success"
+                     v-on:click="getCarHistoryByModelCar">
+                  <i class="mdi mdi-car" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" title="Вывести список аренды по выбранному пользователю" class="btn btn-success"
+                     v-on:click="getCarHistoryByRenter">
+                  <i class="mdi mdi-human-greeting" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" title="Добавить запись аренды" class="btn btn-success" data-toggle="modal"
+                     data-target="#HistoryModal">
+                  <i class="mdi mdi-plus" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" title="Вывести статистику в днях по аренде" class="btn btn-success" data-toggle="modal"
+                     data-target="#historyCarModal">
+                  <i class="mdi mdi-card-account-details" aria-hidden="true"></i>
+                  </button>
+                  <table class="table table-bordered">
+                     <thead>
+                        <tr>
+                           <th scope="col">ФИО</th>
+                           <th scope="col">Название модели машины</th>
+                           <th scope="col">Номер</th>
+                           <th scope="col">Дата начала аренды</th>
+                           <th scope="col">Дата окончания аренды</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr v-for="carHistory in carsHistory" :key="carHistory.id">
+                           <td> {{ carHistory.renter.surname }} {{ carHistory.renter.name }} {{ carHistory.renter.patronymic }}
+                           </td>
+                           <td> {{ carHistory.car.modelCar.name }} </td>
+                           <td> {{ carHistory.car.nomer }} </td>
+                           <td> {{ carHistory.dateFrom | formatDate1 }} </td>
+                           <td> {{ carHistory.dateTo | formatDate1}} </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+            <!-- Добавление записи аренды -->
+            <div class="modal fade" id="HistoryModal" tabindex="-1" role="dialog" aria-labelledby="HistoryModalLabel"
+               aria-hidden="true">
+               <div class="modal-dialog">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <h5 class="modal-title" id="HistoryModalLabel">Добавление машины в аренду</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                     </div>
+                     <div class="modal-body">
+                        <label>Аренда с:</label>
+                        <vuejs-datepicker :format="customFormatter" v-model="dateFrom" name="dateFrom"></vuejs-datepicker>
+                        <label>Аренда до:</label>
+                        <vuejs-datepicker :format="customFormatter" v-model="dateTo" name="dateTo"></vuejs-datepicker>
+                     </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                        <button type="button" class="btn btn-primary" v-on:click="addCarHistory">Сохранить</button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <!-- Добавление машины  -->
+            <div class="modal fade" id="carModal" tabindex="-1" role="dialog" aria-labelledby="carModalLabel"
+               aria-hidden="true">
+               <div class="modal-dialog">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <h5 class="modal-title" id="carModalLabel">Добавление машины</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                     </div>
+                     <div class="modal-body">
+                        <label>Выберите модель машины:</label>
+                        <select class="form-control" v-model="carByModelId">
+                           <option disabled value="">Выберите один из вариантов</option>
+                           <option v-for="modelCar in modelCarArr" v-bind:value="modelCar.id">{{modelCar.name}}</option>
+                        </select>
+                        <label> Введите номер машины:</label>
+                        <input class="form-control form-control-sm" v-model="nomerAdd" type="text"
+                           placeholder="Введите номер машины">
+                     </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                        <button type="button" class="btn btn-primary" v-on:click="addCar">Сохранить</button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <!-- Загрузка статистики по моделям  -->
+            <div class="modal fade" id="historyCarModal" tabindex="-1" role="dialog" aria-labelledby="historyCarModalLabel"
+               aria-hidden="true">
+               <div class="modal-dialog">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <h5 class="modal-title" id="historyCarModalLabel">Информация по аренде</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                     </div>
+                     <div class="modal-body">
+                        <table class="table table-bordered">
+                           <thead>
+                              <tr>
+                                 <th scope="col">Модель машины</th>
+                                 <th scope="col">Количество дней аренды</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              <tr v-for="his in historyTimeArr" >
+                                 <td> {{ his.name }} </td>
+                                 <td> {{ his.result }} </td>
+                              </tr>
+                           </tbody>
+                        </table>
+                     </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <!-- Добавление арендатора  -->
+            <div class="modal fade" id="rentorModal" tabindex="-1" role="dialog" aria-labelledby="rentorModalLabel"
+               aria-hidden="true">
+               <div class="modal-dialog">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <h5 class="modal-title" id="rentorModalLabel">Добавление арендатора</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                     </div>
+                     <div class="modal-body">
+                        <label> Введите Фамилию:</label>
+                        <input class="form-control form-control-sm" v-model="renter.surname" type="text">
+                        <label> Введите Имя:</label>
+                        <input class="form-control form-control-sm" v-model="renter.name" type="text">
+                        <label> Введите Отчество:</label>
+                        <input class="form-control form-control-sm" v-model="renter.patronymic" type="text">
+                     </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                        <button type="button" class="btn btn-primary" v-on:click="addRentor">Сохранить</button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      </div>
+      </div>
+      <script src="index.js"></script>
+   </body>
+</html>
